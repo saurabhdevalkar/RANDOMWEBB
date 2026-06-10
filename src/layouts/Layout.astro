@@ -1,23 +1,77 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  keywords?: string;
+  image?: string;
+  type?: string;
+  canonical?: string;
+  schema?: object;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'Discover the most random, weird, fun, and hidden websites on the internet. Cure boredom instantly — random website generator, weird sites, cool internet gems.',
+  keywords = 'fun websites, websites when bored, cool websites, weird websites, random websites, interesting websites, best websites, hidden gems internet, websites to cure boredom, im bored, boredom cure, things to do when bored, random website generator, website roulette, internet rabbit hole, strange websites, funny websites, addictive websites, entertaining websites, websites to waste time, awesome websites, unique websites, bizarre websites, cool sites, internet discoveries, fun browser games, online boredom cure, free fun websites, best online distractions, productive websites, educational websites, ai tools, free ai tools, gaming websites, retro websites, nostalgic websites, old internet websites, flash game websites, browser games, boredom buster, anti boredom, surprise me website, website spinner, internet playground, must visit websites, secret websites, hidden websites, mind blowing websites, interactive websites, relaxing websites, satisfying websites, creative websites, weird corners of the internet, internet hidden gems, underrated websites, coolest websites ever, websites everyone should know',
+  image = '/og-default.jpg',
+  type = 'website',
+  canonical,
+  schema,
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+const fullTitle = title.includes('Randomwebb') ? title : `${title} | Randomwebb`;
+---
+
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content="Randomwebb" />
+    <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1'} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={new URL(image, Astro.site).href} />
+    <meta property="og:site_name" content="Randomwebb" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.site).href} />
+    <meta name="twitter:site" content="@randomwebb" />
+
+    <!-- Additional SEO -->
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="rating" content="general" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="language" content="English" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
+
+    <!-- Schema.org JSON-LD -->
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

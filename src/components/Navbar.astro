@@ -1,0 +1,32 @@
+---
+import { categories } from '../data/categories';
+---
+
+<nav style="border-bottom:1px solid #2a2a2a;background:#0a0a0a;position:sticky;top:0;z-index:50;">
+  <div style="max-width:960px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:52px;gap:16px;">
+    <a href="/" style="text-decoration:none;flex-shrink:0;">
+      <span style="font-family:'Special Elite',serif;font-size:1.2rem;letter-spacing:0.12em;color:#e8e0d0;text-transform:uppercase;">
+        Randomwebb
+      </span>
+    </a>
+
+    <div style="display:flex;align-items:center;gap:0;overflow-x:auto;flex:1;justify-content:center;">
+      {categories.slice(0, 5).map(cat => (
+        <a href={`/category/${cat.slug}`}
+          style="font-family:'Courier New',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#706860;padding:4px 12px;text-decoration:none;white-space:nowrap;border-right:1px solid #1e1e1e;"
+          onmouseover="this.style.color='#e8e0d0'"
+          onmouseout="this.style.color='#706860'"
+        >
+          {cat.name.replace(' Websites','').replace(' Tools','')}
+        </a>
+      ))}
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <a href="/search" style="font-family:'Courier New',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#706860;text-decoration:none;"
+        onmouseover="this.style.color='#e8e0d0'" onmouseout="this.style.color='#706860'">Search</a>
+      <a href="/blog" style="font-family:'Courier New',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#706860;text-decoration:none;"
+        onmouseover="this.style.color='#e8e0d0'" onmouseout="this.style.color='#706860'">Blog</a>
+    </div>
+  </div>
+</nav>

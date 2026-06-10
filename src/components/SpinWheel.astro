@@ -1,0 +1,139 @@
+---
+import { categories } from '../data/categories';
+---
+
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div style="position:relative;width:280px;height:280px;border:1px solid #2a2a2a;">
+    <canvas id="spin-wheel" width="280" height="280" style="cursor:crosshair;" aria-label="Spin the wheel to discover a random website category"></canvas>
+    <button
+      id="spin-btn"
+      style="position:absolute;inset:0;margin:auto;width:52px;height:52px;background:#0a0a0a;border:1px solid #c8b898;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;color:#c8b898;font-family:'Special Elite',serif;letter-spacing:0.05em;transition:all 0.15s;"
+      onmouseover="this.style.background='#e8e0d0';this.style.color='#0a0a0a'"
+      onmouseout="this.style.background='#0a0a0a';this.style.color='#c8b898'"
+      aria-label="Spin the wheel"
+    >
+      Spin
+    </button>
+    <div style="position:absolute;top:0;left:50%;transform:translateX(-50%) translateY(-2px);width:0;height:0;z-index:20;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:14px solid #c8b898;"></div>
+  </div>
+
+  <div id="spin-result" class="text-center hidden" style="margin-top:16px;border:1px solid #444;background:#161616;padding:16px;">
+    <p style="font-family:'Courier New',monospace;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:#484038;margin-bottom:8px;">Destination</p>
+    <p id="spin-site-name" style="font-family:'Special Elite',serif;font-size:1.1rem;color:#e8e0d0;letter-spacing:0.04em;margin-bottom:12px;"></p>
+    <a id="spin-site-link" href="#" target="_blank" rel="noopener noreferrer"
+      style="font-family:'Special Elite',serif;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;color:#0a0a0a;background:#e8e0d0;border:1px solid #e8e0d0;padding:8px 24px;text-decoration:none;display:inline-block;transition:all 0.15s;"
+      onmouseover="this.style.background='#0a0a0a';this.style.color='#e8e0d0'"
+      onmouseout="this.style.background='#e8e0d0';this.style.color='#0a0a0a'"
+    >
+      Visit →
+    </a>
+  </div>
+</div>
+
+<script>
+  import { websites } from '../data/websites';
+  import { categories } from '../data/categories';
+
+  const canvas = document.getElementById('spin-wheel') as HTMLCanvasElement;
+  const ctx = canvas?.getContext('2d');
+  const btn = document.getElementById('spin-btn');
+  const result = document.getElementById('spin-result');
+  const siteName = document.getElementById('spin-site-name');
+  const siteLink = document.getElementById('spin-site-link') as HTMLAnchorElement;
+
+  if (!canvas || !ctx) throw new Error('Canvas not found');
+
+  const CATS = categories;
+  const NUM = CATS.length;
+  const ARC = (Math.PI * 2) / NUM;
+
+  let currentAngle = 0;
+  let spinning = false;
+
+  function draw(angle: number) {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = cx - 4;
+    ctx!.clearRect(0, 0, canvas.width, canvas.height);
+
+    CATS.forEach((cat, i) => {
+      const start = angle + i * ARC;
+      const end = start + ARC;
+
+      ctx!.beginPath();
+      ctx!.moveTo(cx, cy);
+      ctx!.arc(cx, cy, r, start, end);
+      ctx!.closePath();
+      ctx!.fillStyle = `hsl(0,0%,${10 + (i * 7) % 25}%)`;
+      ctx!.fill();
+      ctx!.strokeStyle = '#0a0a0a';
+      ctx!.lineWidth = 1;
+      ctx!.stroke();
+
+      // Label
+      ctx!.save();
+      ctx!.translate(cx, cy);
+      ctx!.rotate(start + ARC / 2);
+      ctx!.textAlign = 'right';
+      ctx!.fillStyle = '#c8b898';
+      ctx!.font = '10px "Courier New", monospace';
+      ctx!.fillText(cat.name.replace(' Websites', '').replace(' Tools', ''), r - 12, 4);
+      ctx!.restore();
+    });
+
+    // Inner circle
+    ctx!.beginPath();
+    ctx!.arc(cx, cy, 28, 0, Math.PI * 2);
+    ctx!.fillStyle = '#0a0a0a';
+    ctx!.fill();
+    ctx!.strokeStyle = '#444444';
+    ctx!.lineWidth = 1;
+    ctx!.stroke();
+  }
+
+  draw(currentAngle);
+
+  btn?.addEventListener('click', () => {
+    if (spinning) return;
+    spinning = true;
+    if (result) result.classList.add('hidden');
+
+    const extraSpins = 5 + Math.random() * 5;
+    const targetAngle = currentAngle + extraSpins * Math.PI * 2 + Math.random() * Math.PI * 2;
+    const duration = 3000;
+    const start = performance.now();
+    const startAngle = currentAngle;
+
+    function ease(t: number) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function animate(now: number) {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / duration, 1);
+      currentAngle = startAngle + (targetAngle - startAngle) * ease(t);
+      draw(currentAngle);
+
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        spinning = false;
+        // Determine which segment is at top (pointer is at top = -PI/2)
+        const normalizedAngle = ((currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const pointerAngle = (Math.PI * 2 * 2 - normalizedAngle + Math.PI * 1.5) % (Math.PI * 2);
+        const idx = Math.floor(pointerAngle / ARC) % NUM;
+        const cat = CATS[idx];
+        const catSites = websites.filter(w => w.category === cat.slug);
+        const site = catSites[Math.floor(Math.random() * catSites.length)];
+
+        if (site && siteName && siteLink && result) {
+          siteName.textContent = site.title;
+          siteLink.href = site.url;
+          result.classList.remove('hidden');
+        }
+      }
+    }
+
+    requestAnimationFrame(animate);
+  });
+</script>

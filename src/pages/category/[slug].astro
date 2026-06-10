@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import WebsiteCard from '../../components/WebsiteCard.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { categories } from '../../data/categories';
+import { getWebsitesByCategory } from '../../data/websites';
+
+export function getStaticPaths() {
+  return categories.map(cat => ({ params: { slug: cat.slug } }));
+}
+
+const { slug } = Astro.params;
+const cat = categories.find(c => c.slug === slug)!;
+const sites = getWebsitesByCategory(slug);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `${cat.name} — Randomwebb`,
+  description: cat.description,
+  url: `https://randomwebb.com/category/${slug}`,
+};
+---
+
+<Layout
+  title={`${cat.name} — Best ${cat.name} to Explore`}
+  description={`${cat.description}. Browse ${sites.length} hand-picked ${cat.name.toLowerCase()} curated by Randomwebb.`}
+  schema={schema}
+>
+  <Navbar />
+
+  <div class="container-main py-12">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex items-center gap-2 text-xs font-mono text-(--color-muted)">
+        <li><a href="/" class="hover:text-(--color-ink) transition-colors">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-(--color-body-strong)" aria-current="page">{cat.name}</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-10">
+      <div class="flex items-center gap-4 mb-4">
+        <span class="text-5xl">{cat.icon}</span>
+        <div>
+          <h1 class="section-title">{cat.name}</h1>
+          <p class="text-(--color-muted) mt-1">{cat.description}</p>
+        </div>
+      </div>
+      <p class="text-sm text-(--color-muted)">{sites.length} websites curated</p>
+    </div>
+
+    <AdSlot class="mb-10" />
+
+    <!-- Grid -->
+    {sites.length > 0 ? (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {sites.map(site => <WebsiteCard site={site} />)}
+      </div>
+    ) : (
+      <p class="text-(--color-muted) text-center py-20">No websites in this category yet. Check back soon!</p>
+    )}
+
+    <!-- Related categories -->
+    <section class="mt-16">
+      <h2 class="text-lg font-semibold text-(--color-ink) mb-4">Explore Other Categories</h2>
+      <div class="flex flex-wrap gap-2">
+        {categories.filter(c => c.slug !== slug).map(c => (
+          <a href={`/category/${c.slug}`} class="tag-badge hover:text-(--color-ink) hover:border-(--color-muted) transition-colors py-2 px-4">
+            {c.icon} {c.name}
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <Footer />
+</Layout>

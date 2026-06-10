@@ -1,0 +1,87 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import type { BlogPost } from '../../data/blogPosts';
+import { blogPosts } from '../../data/blogPosts';
+
+const featured: BlogPost[] = blogPosts.filter((p: BlogPost) => p.featured).slice(0, 3);
+const rest: BlogPost[] = blogPosts.filter((p: BlogPost) => !p.featured);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Randomwebb Blog',
+  description: 'Articles about fun, weird, educational, and hidden gem websites across the internet.',
+  url: 'https://randomwebb.com/blog',
+};
+---
+
+<Layout
+  title="Blog — Fun Websites, Weird Internet & Hidden Gems"
+  description="Discover articles about the best, weirdest, and most fun websites on the internet. Tips, lists, and guides for internet explorers."
+  type="website"
+  schema={schema}
+>
+  <Navbar />
+
+  <div class="container-main py-12">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex items-center gap-2 text-xs font-mono text-(--color-muted)">
+        <li><a href="/" class="hover:text-(--color-ink)">Home</a></li>
+        <li>/</li>
+        <li class="text-(--color-body-strong)">Blog</li>
+      </ol>
+    </nav>
+
+    <h1 class="section-title mb-2">The Randomwebb Blog</h1>
+    <p class="text-(--color-muted) mb-10">{blogPosts.length} articles about the best and weirdest corners of the internet</p>
+
+    <!-- Featured posts -->
+    <section class="mb-12">
+      <h2 class="text-sm font-mono uppercase tracking-widest text-(--color-muted) mb-6">Featured</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        {featured.map(post => (
+          <a href={`/blog/${post.slug}`} class="card-base p-5 flex flex-col gap-3 group">
+            <span class="tag-badge w-fit" style={`color: var(--color-accent)`}>{post.category}</span>
+            <h3 class="font-semibold text-(--color-ink) leading-snug group-hover:text-(--color-accent) transition-colors line-clamp-2">{post.title}</h3>
+            <p class="text-sm text-(--color-muted) line-clamp-2">{post.description}</p>
+            <div class="flex items-center gap-3 text-xs text-(--color-muted-soft) font-mono mt-auto">
+              <span>{post.date}</span>
+              <span>·</span>
+              <span>{post.readTime} min read</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <AdSlot class="mb-10" />
+
+    <!-- All posts -->
+    <section>
+      <h2 class="text-sm font-mono uppercase tracking-widest text-(--color-muted) mb-6">All Articles</h2>
+      <div class="space-y-px">
+        {rest.map(post => (
+          <a
+            href={`/blog/${post.slug}`}
+            class="flex items-center justify-between gap-4 py-4 px-3 rounded-lg hover:bg-(--color-surface-card) transition-colors group border-b border-(--color-hairline) last:border-0"
+          >
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="tag-badge text-[10px]">{post.category}</span>
+                <span class="text-xs text-(--color-muted-soft) font-mono">{post.readTime} min</span>
+              </div>
+              <h3 class="text-sm font-medium text-(--color-body-strong) group-hover:text-(--color-ink) transition-colors line-clamp-1">{post.title}</h3>
+            </div>
+            <span class="text-xs text-(--color-muted-soft) font-mono shrink-0 hidden sm:block">{post.date}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <Footer />
+</Layout>

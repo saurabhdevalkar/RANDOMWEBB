@@ -1,0 +1,92 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { faqs } from '../data/faqs';
+
+const grouped = faqs.reduce((acc, faq) => {
+  (acc[faq.category] ??= []).push(faq);
+  return acc;
+}, {} as Record<string, typeof faqs>);
+
+const categoryLabels: Record<string, string> = {
+  general: '📋 General',
+  discovery: '🔍 Discovery & Features',
+  technical: '⚙️ Technical',
+  content: '📚 Content & Categories',
+};
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(faq => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer,
+    },
+  })),
+};
+---
+
+<Layout
+  title="FAQ — Frequently Asked Questions | Randomwebb"
+  description="Answers to the most common questions about Randomwebb — how it works, what's in our database, how to discover websites, and more."
+  schema={schema}
+>
+  <Navbar />
+
+  <div class="container-main py-12">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex items-center gap-2 text-xs font-mono text-(--color-muted)">
+        <li><a href="/" class="hover:text-(--color-ink)">Home</a></li>
+        <li>/</li>
+        <li class="text-(--color-body-strong)">FAQ</li>
+      </ol>
+    </nav>
+
+    <div class="max-w-3xl mx-auto">
+      <h1 class="section-title mb-2">Frequently Asked Questions</h1>
+      <p class="text-(--color-muted) mb-10">{faqs.length} answers to everything you might want to know about Randomwebb</p>
+
+      <AdSlot class="mb-10" />
+
+      {Object.entries(grouped).map(([cat, items]) => (
+        <section class="mb-12">
+          <h2 class="text-sm font-mono uppercase tracking-widest text-(--color-muted) mb-6 pb-3 border-b border-(--color-hairline)">
+            {categoryLabels[cat] ?? cat}
+          </h2>
+          <div class="space-y-2">
+            {items.map((faq, i) => (
+              <details class="group border border-(--color-hairline) rounded-xl overflow-hidden bg-(--color-surface-card) hover:border-(--color-hairline-strong) transition-colors">
+                <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none select-none">
+                  <span class="font-medium text-(--color-body-strong) group-open:text-(--color-ink) transition-colors pr-4">{faq.question}</span>
+                  <svg class="shrink-0 text-(--color-muted) transition-transform group-open:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </summary>
+                <div class="px-5 pb-5 text-sm text-(--color-body) leading-relaxed border-t border-(--color-hairline) pt-4">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <!-- CTA -->
+      <div class="mt-12 p-6 rounded-2xl bg-(--color-surface-elevated) border border-(--color-hairline) text-center">
+        <p class="text-(--color-body) mb-4">Still have questions? Explore Randomwebb or search our site directory.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="/" class="btn-primary text-sm">🎲 Start Exploring</a>
+          <a href="/search" class="btn-outline text-sm">🔍 Search Websites</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Footer />
+</Layout>

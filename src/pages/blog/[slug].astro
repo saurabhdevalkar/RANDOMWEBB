@@ -1,0 +1,159 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import WebsiteCard from '../../components/WebsiteCard.astro';
+import { blogPosts } from '../../data/blogPosts';
+import { websites } from '../../data/websites';
+
+export function getStaticPaths() {
+  return blogPosts.map(post => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+
+// Related websites — match by category or tags
+const relatedSites = websites
+  .filter(w => post.tags.some(t => w.tags.includes(t) || w.category === post.category))
+  .slice(0, 4);
+
+// Related posts
+const relatedPosts = blogPosts
+  .filter(p => p.slug !== post.slug && (p.category === post.category || p.tags.some(t => post.tags.includes(t))))
+  .slice(0, 3);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.description,
+  datePublished: post.date,
+  author: { '@type': 'Organization', name: 'Randomwebb' },
+  publisher: { '@type': 'Organization', name: 'Randomwebb', url: 'https://randomwebb.com' },
+  url: `https://randomwebb.com/blog/${post.slug}`,
+  keywords: post.tags.join(', '),
+};
+---
+
+<Layout
+  title={post.title}
+  description={post.description}
+  type="article"
+  schema={schema}
+>
+  <Navbar />
+
+  <div class="container-main py-12">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex items-center gap-2 text-xs font-mono text-(--color-muted)">
+        <li><a href="/" class="hover:text-(--color-ink)">Home</a></li>
+        <li>/</li>
+        <li><a href="/blog" class="hover:text-(--color-ink)">Blog</a></li>
+        <li>/</li>
+        <li class="text-(--color-body-strong) truncate max-w-xs">{post.title}</li>
+      </ol>
+    </nav>
+
+    <div class="max-w-3xl mx-auto">
+      <!-- Meta -->
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        <span class="tag-badge text-(--color-accent)">{post.category}</span>
+        <span class="text-xs font-mono text-(--color-muted)">{post.date}</span>
+        <span class="text-xs font-mono text-(--color-muted)">{post.readTime} min read</span>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-bold text-(--color-ink) leading-tight mb-4">{post.title}</h1>
+      <p class="text-lg text-(--color-body) leading-relaxed mb-8 border-l-2 border-(--color-accent) pl-4">{post.description}</p>
+
+      <AdSlot class="mb-10" />
+
+      <!-- Article body - generated SEO content -->
+      <article class="prose-content">
+        <p>The internet is vast, endlessly surprising, and full of corners most people never find. In this article, we explore {post.title.toLowerCase()} — diving deep into what makes these websites worth your time and how to find more like them.</p>
+
+        <h2>Why These Websites Matter</h2>
+        <p>In an era dominated by social media feeds and algorithmic content, stumbling upon a genuinely unique website feels increasingly rare. Yet the internet still harbors thousands of projects built purely out of creativity, curiosity, or a desire to solve a problem no one else has tackled.</p>
+        <p>The websites we cover here represent that spirit. Whether they're built by solo developers, small teams, or passionate communities, they all share one thing: they're genuinely worth your time.</p>
+
+        <h2>What You'll Find</h2>
+        <p>This curated selection covers topics in the <strong>{post.category}</strong> space, with particular attention to sites tagged with: {post.tags.join(', ')}. Each site has been manually reviewed for quality, originality, and usefulness.</p>
+
+        <h2>How to Make the Most of These Sites</h2>
+        <p>The best way to explore these websites is with an open mind and no agenda. Let serendipity guide you. Click something that looks interesting. Follow a link. You might end up somewhere completely unexpected — and that's the point.</p>
+        <p>If you're using Randomwebb's Spin Wheel feature, each spin lands on a category and surfaces a recommended site. It's the digital equivalent of opening to a random page in a book.</p>
+
+        <h2>Related Categories to Explore</h2>
+        <p>If you enjoyed these picks, you'll likely also enjoy browsing Randomwebb's full category library. From <a href="/category/weird" class="text-(--color-link)">Weird Websites</a> to <a href="/category/hidden-gems" class="text-(--color-link)">Hidden Gems</a>, there's always something new to discover.</p>
+
+        <h2>The Future of Web Discovery</h2>
+        <p>Web discovery is changing. Algorithmic feeds increasingly show us what we already know. Randomwebb is built on the opposite philosophy: serendipity, curation, and genuine human taste. The internet is weird and wonderful — we're here to help you find the best of it.</p>
+
+        <p>Have a site you think should be listed? <a href="/search" class="text-(--color-link)">Search our database</a> to see if it's already here, or suggest it via the footer.</p>
+      </article>
+
+      <!-- Tags -->
+      <div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-(--color-hairline)">
+        {post.tags.map(tag => (
+          <a href={`/search?q=${tag}`} class="tag-badge hover:text-(--color-ink) transition-colors">{tag}</a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Related websites -->
+    {relatedSites.length > 0 && (
+      <section class="mt-16">
+        <h2 class="section-title mb-6">Related Websites to Explore</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {relatedSites.map(site => <WebsiteCard site={site} />)}
+        </div>
+      </section>
+    )}
+
+    <!-- Related posts -->
+    {relatedPosts.length > 0 && (
+      <section class="mt-16">
+        <h2 class="text-lg font-semibold text-(--color-ink) mb-6">More Articles</h2>
+        <div class="grid sm:grid-cols-3 gap-4">
+          {relatedPosts.map(p => (
+            <a href={`/blog/${p.slug}`} class="card-base p-5 group">
+              <span class="tag-badge mb-3 block w-fit">{p.category}</span>
+              <h3 class="text-sm font-medium text-(--color-body-strong) group-hover:text-(--color-ink) transition-colors line-clamp-2">{p.title}</h3>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+
+  <Footer />
+</Layout>
+
+<style>
+  .prose-content {
+    color: var(--color-body);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .prose-content h2 {
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .prose-content p {
+    margin-bottom: 1.25rem;
+  }
+  .prose-content strong {
+    color: var(--color-body-strong);
+    font-weight: 600;
+  }
+  .prose-content a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

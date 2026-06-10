@@ -1,0 +1,37 @@
+---
+import { categories } from '../data/categories';
+const year = new Date().getFullYear();
+---
+
+<footer style="border-top:1px solid #2a2a2a;margin-top:60px;padding:40px 0 24px;background:#0a0a0a;">
+  <div style="max-width:960px;margin:0 auto;padding:0 1.5rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:32px;padding-bottom:32px;border-bottom:1px solid #1e1e1e;">
+      <div>
+        <div style="font-family:'Special Elite',serif;font-size:1rem;letter-spacing:0.1em;text-transform:uppercase;color:#e8e0d0;margin-bottom:12px;">Randomwebb</div>
+        <p style="font-family:'Courier New',monospace;font-size:0.7rem;color:#484038;line-height:1.7;">Discover the weird &amp; wonderful corners of the internet.</p>
+      </div>
+      <div>
+        <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:#484038;margin-bottom:12px;">Categories</div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
+          {categories.map(cat => (
+            <li><a href={`/category/${cat.slug}`} style="font-family:'Courier New',monospace;font-size:0.7rem;color:#706860;text-decoration:none;"
+              onmouseover="this.style.color='#c8b898'" onmouseout="this.style.color='#706860'">{cat.name}</a></li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:#484038;margin-bottom:12px;">Navigate</div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
+          {[['Blog','/blog'],['FAQs','/faq'],['Search','/search'],['Sitemap','/sitemap.xml']].map(([l,h]) => (
+            <li><a href={h} style="font-family:'Courier New',monospace;font-size:0.7rem;color:#706860;text-decoration:none;"
+              onmouseover="this.style.color='#c8b898'" onmouseout="this.style.color='#706860'">{l}</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div style="padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span style="font-family:'Courier New',monospace;font-size:0.62rem;color:#2a2a2a;">&copy; {year} Randomwebb</span>
+      <a href="/privacy" style="font-family:'Courier New',monospace;font-size:0.62rem;color:#2a2a2a;text-decoration:none;">Privacy</a>
+    </div>
+  </div>
+</footer>
