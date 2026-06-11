@@ -202,10 +202,61 @@ const schema = {
 </Layout>
 
 <script>
-  import { websites } from '../data/websites';
+  const randomUrls = [
+    'https://pointerpointer.com',
+    'https://www.staggeringbeauty.com',
+    'https://heeeeeeeey.com',
+    'https://cat-bounce.com',
+    'https://longdogechallenge.com',
+    'https://corndog.io',
+    'https://www.omfgdogs.com',
+    'https://thatsthefinger.com',
+    'https://eelslap.com',
+    'https://endless.horse',
+    'https://www.fallingfalling.com',
+    'https://www.zoomquilt.org',
+    'https://zoomquilt2.com',
+    'https://theuselessweb.com',
+    'https://www.trypap.com',
+    'https://www.republiquedesmangues.fr',
+    'https://www.bouncingdvdlogo.com',
+    'https://mondrianandme.com',
+    'https://smashthewalls.com',
+    'https://alwaysjudgeabookbyitscover.com',
+    'https://hackertyper.net',
+    'https://fakeupdate.net',
+    'https://r33b.net',
+    'https://isitchristmas.com',
+    'https://ismycomputeron.com',
+    'https://www.nullingthevoid.com',
+    'https://www.koalastothemax.com',
+    'https://corgiorgy.com',
+    'https://beesbeesbees.com',
+    'https://www.partridgegetslucky.com',
+    'https://www.movenowthinklater.com',
+    'https://www.rrrgggbbb.com',
+    'https://www.shadyurl.com',
+    'https://www.everydayim.com',
+    'https://checkboxrace.com',
+    'https://crouton.net',
+    'https://binarypiano.com',
+    'https://www.clicktoremove.com',
+    'https://www.donothingfor2minutes.com',
+    'https://www.hacktheplanet.com',
+    'https://weavesilk.com',
+    'https://www.ismysslsecure.com',
+    'https://www.window-swap.com',
+    'https://findtheinvisiblecow.com',
+    'https://nooooooooooooooo.com',
+    'https://www.screamintothevoid.com',
+    'https://www.yesnoif.com',
+    'https://www.mapcrunch.com',
+    'https://www.thisman.org',
+    'https://www.deathdate.info',
+  ];
   function goRandom() {
-    const site = websites[Math.floor(Math.random() * websites.length)];
-    window.open(site.url, '_blank', 'noopener,noreferrer');
+    const url = randomUrls[Math.floor(Math.random() * randomUrls.length)];
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
   document.getElementById('random-btn')?.addEventListener('click', goRandom);
   document.getElementById('random-btn-2')?.addEventListener('click', goRandom);
